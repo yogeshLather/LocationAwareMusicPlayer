@@ -8,11 +8,24 @@
 
     <ListView
         android:id="@+id/listView"
-        android:layout_width="409dp"
-        android:layout_height="729dp"
+        android:layout_width="406dp"
+        android:layout_height="530dp"
+        android:background="#EDDCDC"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintHorizontal_bias="0.405"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.0" />
+
+    <ListView
+        android:id="@+id/userView"
+        android:layout_width="400dp"
+        android:layout_height="430dp"
+        android:background="#F8F4F4"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.396"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/listView" />
 </androidx.constraintlayout.widget.ConstraintLayout>

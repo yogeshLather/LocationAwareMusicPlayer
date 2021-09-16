@@ -6,13 +6,21 @@ import android.content.Intent;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
+import com.androidnetworking.AndroidNetworking;
+import com.androidnetworking.common.Priority;
+import com.androidnetworking.error.ANError;
+import com.androidnetworking.interfaces.StringRequestListener;
+
 import java.io.File;
 import java.util.ArrayList;
+
 
 public class PlaySong extends AppCompatActivity {
 
@@ -32,21 +40,27 @@ public class PlaySong extends AppCompatActivity {
     int position;
     SeekBar seekBar;
     Thread updateSeek;
+    Button shareLocation;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        AndroidNetworking.initialize(getApplicationContext());
         setContentView(R.layout.play_song);
         textView = findViewById(R.id.textView);
         play = findViewById(R.id.play);
         previous = findViewById(R.id.previous);
         next = findViewById(R.id.next);
         seekBar = findViewById(R.id.seekBar);
+        shareLocation = findViewById(R.id.shareLocation);
 
         Intent intent = getIntent();
         Bundle bundle = intent.getExtras();
+
         songs = (ArrayList) bundle.getParcelableArrayList("songList");
         textContent = intent.getStringExtra("currentSong");
+        String city = intent.getStringExtra("city");
+        String name = intent.getStringExtra("name");
         textView.setText(textContent);
         textView.setSelected(true);
         position = intent.getIntExtra("position", 0);
@@ -54,6 +68,15 @@ public class PlaySong extends AppCompatActivity {
         mediaPlayer = MediaPlayer.create(this, uri);
         mediaPlayer.start();
         seekBar.setMax(mediaPlayer.getDuration());
+
+        shareLocation.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Log.i("Share Location", "Clicked on share location");
+                setShareLocation(city, name,
+                        songs.get(position).getName().replace(".mp3", "").toString());
+            }
+        });
 
         seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
@@ -145,5 +168,24 @@ public class PlaySong extends AppCompatActivity {
 
             }
         });
+    }
+
+    private void setShareLocation(String city, String name, String songName) {
+        AndroidNetworking.post("http://10.0.2.2:8080/shareMyLocation")
+                .addBodyParameter("city", city)
+                .addBodyParameter("name", name)
+                .addBodyParameter("songName", songName)
+                .setPriority(Priority.MEDIUM)
+                .build()
+                .getAsString(new StringRequestListener() {
+                    @Override
+                    public void onResponse(String response) {
+                        Log.i(response, city);
+                    }
+                    @Override
+                    public void onError(ANError error) {
+                        Log.i("Error REST POST","Error " +  error.getMessage());
+                    }
+                });
     }
 }
